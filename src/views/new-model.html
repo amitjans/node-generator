@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Modelo</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css">
+</head>
+
+<body>
+
+    <form class="p-4">
+        <div class="form-group">
+            <!-- off/none on/sentences words characters -->
+            <input type="text" class="form-control" id="name" placeholder="Modelo" autofocus autocapitalize="words">
+        </div>
+        <div id="propiedades">
+            <div class="form-group">
+                <input type="text" class="form-control" id="property0">
+                <select name="" class="form-control" id="type0">
+                    <option value="String">String</option>
+                    <option value="Boolean">Boolean</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="">versionKey</label>
+            <input type="checkbox" class="form-control" id="versionKey" value="versionKey">
+        </div>
+        <div class="form-group">
+            <label for="">timestamps</label>
+            <input type="checkbox" class="form-control" id="timestamps" value="timestamps" checked>
+        </div>
+        <span class="btn btn-primary btn-block" id="addprop">Nueva Propiedad</span>
+        <button class="btn btn-primary btn-block"> Guardar Modelo</button>
+    </form>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const form = document.querySelector('form');
+        const addprop = document.querySelector('#addprop');
+        const propiedades = document.querySelector('#propiedades');
+        let i = 0;
+
+        form.addEventListener('submit', e => {
+            const newModel = {
+                name: document.querySelector('#name').value,
+                timestamps: document.querySelector('#timestamps').checked,
+                versionKey: document.querySelector('#versionKey').checked,
+                property: []
+            };
+
+            for (let j = 0; j < i + 1; j++) {
+                let name = document.querySelector('#property' + j).value;
+                let type = document.querySelector('#type' + j).value;
+                newModel.property.push({ name: name, type: type});
+            }
+
+            ipcRenderer.send('model:new', newModel)
+            e.preventDefault();
+        });
+
+        addprop.addEventListener('click', e => {
+            i = i + 1;
+            propiedades.innerHTML += `
+                <div class="form-group">
+                    <input type="text" class="form-control" id="property${i}">
+                    <select name="" class="form-control" id="type${i}">
+                        <option value="String">String</option>
+                        <option value="Boolean">Boolean</option>
+                    </select>
+                </div>
+                `;
+        });
+    </script>
+
+</body>
+
+</html>
